@@ -70,17 +70,27 @@ router.get('/:companyId', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
 
-    const { companyId, data_extracao, vendas_por_dia, vendas_por_grupo, vendas_por_atendente } = req.body;
+    const { companyCnpj, data_extracao, vendas_por_dia, vendas_por_grupo, vendas_por_atendente } = req.body;
 
-    if (!companyId || !data_extracao || !vendas_por_dia || !vendas_por_grupo || !vendas_por_atendente) {
+    if (!companyCnpj || !data_extracao || !vendas_por_dia || !vendas_por_grupo || !vendas_por_atendente) {
         res.status(400).json({ message: "All fields are required" });
         return;
     }
     try {
 
+        const company = await prisma.company.findUnique({
+            where: { cnpj: companyCnpj },
+        });
+
+        if (!company) {
+            res.status(404).json({ message: "Company not found" });
+            return;
+        }
+
+        const companyId = company.id;
+
         const formattedDate = new Date(data_extracao.split('T')[0] + 'T03:00:00.000Z');
 
-        // Verificar se já existe um registro para esta data e empresa
         const existingSalesData = await prisma.saleData.findUnique({
             where: {
                 companyId_data_extracao: {
@@ -93,7 +103,6 @@ router.post('/', async (req: Request, res: Response) => {
         let result
 
         if (existingSalesData) {
-            // Atualizar o registro existente
             result = await prisma.saleData.update({
                 where: {
                     id: existingSalesData.id,
@@ -106,7 +115,6 @@ router.post('/', async (req: Request, res: Response) => {
                 },
             });
         } else {
-            // Criar um novo registro
             result = await prisma.saleData.create({
                 data: {
                     companyId,
