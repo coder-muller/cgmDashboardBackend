@@ -14,14 +14,16 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
-  email     String    @unique
+  email     String  @unique
   password  String
-  validated Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Company   Company[]
+  validated Boolean @default(false)
+
+  Company Company[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Company {
@@ -33,7 +35,7 @@ model Company {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   salesData SaleData[]
 }
 
@@ -48,8 +50,8 @@ model SaleData {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   // Dados de venda serializados como JSON
-  vendas_por_dia      Json
-  vendas_por_grupo    Json
+  vendas_por_dia       Json
+  vendas_por_grupo     Json
   vendas_por_atendente Json
 
   @@unique([companyId, data_extracao])

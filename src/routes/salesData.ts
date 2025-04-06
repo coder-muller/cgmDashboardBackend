@@ -63,6 +63,7 @@ router.get('/:companyId', async (req: Request, res: Response) => {
 
         res.status(200).json(salesData);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Error fetching sales data" });
     }
 });
