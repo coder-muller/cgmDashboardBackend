@@ -52,7 +52,7 @@ services:
       - ./package.json:/app/package.json:cached
       - ./package-lock.json:/app/package-lock.json:cached
       - ./tsconfig.json:/app/tsconfig.json:cached
-      - /app/node_modules
+      # - /app/node_modules
     command: npm run start
 
 volumes:
