@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: dashboard-database
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: newdbav5
+      POSTGRES_DB: cgm-dashboard
+    ports:
+      - "2345:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - traefik-public
+
+  app:
+    build: .
+    container_name: dashboard-api
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://root:newdbav5@db:5432/cgm-dashboard"
+      PORT: "3333"
+      JWT_SECRET: "secretTo3enC0D3forJW7"
+      VALIDATED_USER: "guilhermemullerxx@gmail.com"
+
+    labels:
+      - traefik.enable=true
+
+      - traefik.http.routers.cgmDashboard-http.rule=Host(`dashboard.cgmcloud.com.br`)
+      - traefik.http.routers.cgmDashboard-http.entrypoints=http
+      - traefik.http.routers.cgmDashboard-http.middlewares=https-redirect
+
+      - traefik.http.routers.cgmDashboard-https.rule=Host(`dashboard.cgmcloud.com.br`)
+      - traefik.http.routers.cgmDashboard-https.entrypoints=https
+      - traefik.http.routers.cgmDashboard-https.tls=true
+      - traefik.http.routers.cgmDashboard-https.tls.certresolver=le
+      - traefik.http.routers.cgmDashboard-https.service=cgmDashboard-service
+      - traefik.http.services.cgmDashboard-service.loadbalancer.server.port=3333
+    networks:
+      - traefik-public
+    ports:
+      - "3333:3333"
+    volumes:
+      # Mount everything except .env file
+      - ./prisma:/app/prisma:cached
+      - ./src:/app/src:cached
+      - ./package.json:/app/package.json:cached
+      - ./package-lock.json:/app/package-lock.json:cached
+      - ./tsconfig.json:/app/tsconfig.json:cached
+      - /app/node_modules
+    command: npm run start
+
+volumes:
+  pg_data:
+
+
+networks:
+  traefik-public:
+    external: true
