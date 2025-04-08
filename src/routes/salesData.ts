@@ -72,8 +72,22 @@ router.post('/', async (req: Request, res: Response) => {
 
     const { companyCnpj, data_extracao, vendas_por_dia, vendas_por_grupo, vendas_por_atendente } = req.body;
 
-    if (!companyCnpj || !data_extracao || !vendas_por_dia || !vendas_por_grupo || !vendas_por_atendente) {
-        res.status(400).json({ message: "All fields are required" });
+    const requiredFields = {
+        companyCnpj,
+        data_extracao,
+        vendas_por_dia,
+        vendas_por_grupo,
+        vendas_por_atendente
+    };
+
+    const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => !value)
+        .map(([field]) => field);
+
+    if (missingFields.length > 0) {
+        res.status(400).json({
+            message: `All fields are required, missing: ${missingFields.join(', ')}`
+        });
         return;
     }
     try {
@@ -90,6 +104,8 @@ router.post('/', async (req: Request, res: Response) => {
         const companyId = company.id;
 
         const formattedDate = new Date(data_extracao.split('T')[0] + 'T03:00:00.000Z');
+
+        console.log(`Enviando dados da data: ${formattedDate.toLocaleDateString('pt-BR')}`)
 
         const existingSalesData = await prisma.saleData.findUnique({
             where: {

@@ -1,10 +1,10 @@
-import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import usersRouter from "./routes/users";
+import express, { Request, Response } from "express";
 import authRouter from "./routes/auth";
-import salesDataRouter from "./routes/salesData";
 import companyRouter from "./routes/company";
+import salesDataRouter from "./routes/salesData";
+import usersRouter from "./routes/users";
 
 dotenv.config();
 
@@ -16,7 +16,11 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to the CGM Dashboard API");
+    res.status(404)
+});
+
+app.get("/api-test", (req: Request, res: Response) => {
+    res.send('API Funcionando!')
 });
 
 app.use("/auth", authRouter);
@@ -24,6 +28,6 @@ app.use("/users", usersRouter);
 app.use("/company", companyRouter);
 app.use("/salesData", salesDataRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT as number, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
