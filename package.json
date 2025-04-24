@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "studio": "npx prisma studio",
+    "migrate": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "prisma": "^6.5.0"
+    "prisma": "^6.5.0",
+    "ts-node": "^10.9.2"
   }
 }

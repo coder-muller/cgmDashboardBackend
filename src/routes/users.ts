@@ -21,6 +21,7 @@ router.get("/", async (req: Request, res: Response) => {
                     select: {
                         id: true,
                         name: true,
+                        cnpj: true,
                     },
                 },
             },
